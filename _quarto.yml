@@ -4,7 +4,7 @@ project:
   
 book:
   title: "fitopatometria-r"
-  author: "Jane Doe"
+  author: "Epifito"
   date: "7/29/2022"
   chapters:
     - index.qmd
