@@ -2,9 +2,9 @@
   {
     "objectID": "index.html",
     "href": "index.html",
-    "title": "fitopatometria-r",
+    "title": "Fitopatometria-r",
     "section": "",
-    "text": "This is a Quarto book.\nTo learn more about Quarto books visit https://quarto.org/docs/books.\n\n1 + 1\n\n[1] 2"
+    "text": "Objetivos\n\nFamiliarizar al alumnado con herramientas (paquetes) del software R para manipular datos fitopatométricos.\n\nDestinatarios\n\nAgrónomos, Biologos, Biotecnologos, etc, con conocimientos básicos sobre R.\n\nUso\n\nEste manual web es un compendio de códigos que se utilizaran a lo largo del curso. Se sugiere tener descargados los mismos previamente a la clase para poder ir reproduciendo simultaneamente.\n\n“The cornerstone of epidemic analysis”\n\n— Campbell and Neher, 1994"
   },
   {
     "objectID": "intro.html",

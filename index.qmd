@@ -1,9 +1,17 @@
-# Intro {.unnumbered}
+# Bienvenid\@s {.unnumbered}
 
-This is a Quarto book.
+-   Objetivos
 
-To learn more about Quarto books visit <https://quarto.org/docs/books>.
+Familiarizar al alumnado con herramientas (paquetes) del software R para manipular datos fitopatométricos.
 
-```{r}
-1 + 1
-```
+-   Destinatarios
+
+Agrónomos, Biologos, Biotecnologos, etc, con conocimientos básicos sobre R.
+
+-   Uso
+
+Este manual web es un compendio de códigos que se utilizaran a lo largo del curso. Se sugiere tener descargados los mismos previamente a la clase para poder ir reproduciendo simultaneamente.
+
+> "The cornerstone of epidemic analysis" `r tufte::quote_footer('--- Campbell and Neher, 1994')`
+
+![](fig/cornerstone.png)

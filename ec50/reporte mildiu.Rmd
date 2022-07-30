@@ -1,0 +1,193 @@
+---
+title: "Sensibilidad de Plasmopara halstedii a oxathiapiprolin"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F, message = F, warning = F)
+library(drc)
+library(tidyverse)
+```
+
+```{r include=FALSE}
+options(gargle_oauth_email = "edwardsmolina@gmail.com")
+```
+
+```{r eval=FALSE, include=FALSE}
+# Or, if you don't use multiple Google identities, you can be more vague:
+options(gargle_oauth_email = TRUE)
+
+# Approach #2: call PACKAGE_auth() proactively.
+library(googledrive)
+# Either specify the user:
+drive_auth(email = "edwardsmolina@gmail.com")
+# Or, if you don't use multiple Google identities, you can be more vague:
+drive_auth(email = TRUE)
+```
+
+
+```{r echo=FALSE}
+u <- "https://docs.google.com/spreadsheets/d/1tAeMng_wLlZfDfeeLzgV8h7vGqWmFhqQv1AAXf60HtU/edit?usp=sharing"
+
+mild <- googlesheets4::read_sheet(u, sheet="sensib-fungic") %>% 
+  mutate_if(is.character, as.factor) %>% 
+  dplyr::select(-ai, iso=strain, rep=plate_rep)  
+```
+
+## Exploración de datos 
+
+Pantallazo del dataset (6 primeras y ultimas filas )
+
+```{r}
+head(mild); tail(mild)
+```
+
+Pruebo con la variable inc para la estimación de los ec50 por aislamiento (iso)
+
+Cuantos valores inc = 0 hay en cada combinación aislamiento - dosis?   
+
+```{r}
+xtabs(inc>0~iso+dose, mild)
+```
+
+Descarto las dosis > 2.5 ppm (y el aislamiento RQ11, para que revean posible error experimental)  
+
+```{r}
+mild %>% 
+  # group_by(strain, dose) %>% 
+  # summarise_at(vars(inc:inc_lat), mean, na.rm = TRUE) %>% 
+  # filter(dose<2.5) %>%
+  filter(dose<2) %>% 
+  ggplot(aes(x=dose, y=inc))+
+  geom_smooth(se=F)+
+  geom_point(alpha=0.2, size=2)+
+  facet_wrap("iso")
+```
+
+Continuo el ajuste por modelo no lineares con aquellos aislamientos que tienen valores medios de inc>0 para las dosis 0.025, 0.25 o 2.5  
+
+```{r}
+mild1 <- mild %>% 
+  select(-sev, -inc_lat) %>% 
+  group_by(iso, dose) %>% 
+  summarise(inc=mean(inc, na.rm=T)) %>% 
+  spread(dose,inc) %>% 
+  filter(`0.025` > 0 | `0.25` > 0 | `2.5` > 0) %>% 
+  select(iso:`2.5`) %>% 
+  filter(!iso=="RQ11") %>% 
+  droplevels()
+iso_sele <- levels(mild1$iso) 
+mild1
+```
+
+Descarto los aislamientos que no desarrollaron sintomas con la menor dosis
+
+```{r}
+descart <- mild %>% 
+  select(-(sev:inc_lat)) %>% 
+  group_by(iso, dose) %>% 
+  summarise(inc=mean(inc, na.rm=T)) %>% 
+  spread(dose,inc) %>% 
+  filter(!(`0.025` > 0 | `0.25` > 0 | `2.5` > 0)) %>% 
+  mutate(ec50=0.0125)
+descart 
+```
+
+```{r}
+mild2 <- mild %>% #gather(dose, inc, -iso) %>%
+  filter(iso %in% iso_sele & dose<2.5) %>% 
+  drop_na()
+```
+
+Ajuste  de curvas y estimacion de ec50 por iso
+
+* Ejemplo de ajuste para BAL_Ad
+
+```{r}
+fit <- drm(inc ~ dose, data = subset(mild2, iso=="BAL_Ad"), 
+    fct = LL.3()) 
+ED(fit, c(50), interval = "delta")
+plot(fit)
+abline(v=0.012708, col=2)
+```
+
+comparo el ajuste con otros modelos que podrian ajustar a estos datos (cuanto menor IC, mejor modelo)
+```{r}
+mselect(fit, list(EXD.3(), LL.4(), LL.5()), icfct = AIC)
+```
+
+Exploración visual de la distribución de residuales
+
+```{r}
+plot(fitted(fit), residuals(fit)) 
+abline(h=0)
+```
+
+Ajuste global de los 7 iso seleccionados (por iso)
+
+```{r}
+mod_iso <- drm(inc ~ dose, 
+           curveid = iso,
+           data = mild2, fct = LL.3())
+# summary(mod_iso)
+mselect(mod_iso, list(LL.4(), LL.5()), icfct = AIC)
+```
+
+```{r}
+plot(mod_iso, col = TRUE)
+```
+
+```{r eval=FALSE, include=FALSE}
+# média geral
+mod_overall <- drm(inc ~ dose, 
+           # curveid = iso,
+           data = mild2, fct =  LL.3())
+# summary(mod_overall)
+anova(mod_iso, mod_overall)
+AIC(mod_iso, mod_overall)
+```
+
+```{r include=FALSE}
+ec50s <- data.frame(ED(mod_iso, c(50))) %>%
+  rownames_to_column(var = "iso") %>% 
+  arrange(-Estimate) 
+
+```
+
+```{r}
+ec50s$iso <- unlist(qdapRegex::rm_between(ec50s$iso, ":", ":", extract=TRUE))
+ec50s 
+
+```
+
+La comparacion de ec50 entre aislamientos no da diferencias entre ellos (ultima columna de la sig. tabla) probablemente por el alto error estandar de los ec50 estimados (por los pocos puntos con que se estimaron los parametros)
+
+```{r}
+EDcomp(mod_iso, c(50,50))
+```
+
+```{r}
+ec50s %>% 
+  ggplot(aes(x=fct_reorder(iso, Estimate, .desc = F), y=Estimate)) + 
+  geom_point()+
+  # geom_pointrange(aes(ymin = Lower, ymax = Upper)) +
+  coord_flip() + 
+  labs(x= "Aislamiento", y="CE50")
+```
+
+```{r eval=FALSE, include=FALSE}
+bind_rows(
+  ec50s %>% select(iso, ec50 = Estimate), 
+  descart %>% select(iso, ec50)
+) %>% 
+  arrange(-ec50)
+```
+
+
+Nota: funciones disponibles en paquete [drc](https://cran.r-project.org/web/packages/drc/drc.pdf)
+
+```{r}
+getMeanFunctions()
+```
+
+

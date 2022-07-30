@@ -3,9 +3,9 @@ project:
   output-dir: _book
   
 book:
-  title: "fitopatometria-r"
+  title: "Fitopatometria-r"
   author: "Epifito"
-  date: "7/29/2022"
+  date: ""
   chapters:
     - index.qmd
     - intro.qmd
