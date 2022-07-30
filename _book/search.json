@@ -4,7 +4,7 @@
     "href": "index.html",
     "title": "Fitopatometria-r",
     "section": "",
-    "text": "Objetivos\n\nFamiliarizar al alumnado con herramientas (paquetes) del software R para manipular datos fitopatométricos.\n\nDestinatarios\n\nAgrónomos, Biologos, Biotecnologos, etc, con conocimientos básicos sobre R.\n\nUso\n\nEste manual web es un compendio de códigos que se utilizaran a lo largo del curso. Se sugiere tener descargados los mismos previamente a la clase para poder ir reproduciendo simultaneamente.\n\n“The cornerstone of epidemic analysis”\n\n— Campbell and Neher, 1994"
+    "text": "“The cornerstone of epidemic analysis”\n\n— Campbell and Neher, 1994\n\n\n\nBienvenid@s\n\nObjetivos\n\nFamiliarizar al alumnado con herramientas (paquetes) del software R para manipular datos fitopatométricos.\n\nDestinatarios\n\nAgrónomos, Biologos, Biotecnologos, etc, con conocimientos básicos sobre R.\n\nUso\n\nEste manual web es un compendio de códigos que se utilizaran a lo largo del curso. Se sugiere tener descargados los mismos previamente a la clase para poder ir reproduciendo simultaneamente."
   },
   {
     "objectID": "intro.html",

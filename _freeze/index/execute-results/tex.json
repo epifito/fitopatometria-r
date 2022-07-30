@@ -1,0 +1,20 @@
+{
+  "hash": "8a7e29c403a861629257d3fdd60a5ef1",
+  "result": {
+    "markdown": "# Bienvenid\\@s {.unnumbered}\n\n-   Objetivos\n\nFamiliarizar al alumnado con herramientas (paquetes) del software R para manipular datos fitopatométricos.\n\n-   Destinatarios\n\nAgrónomos, Biologos, Biotecnologos, etc, con conocimientos básicos sobre R.\n\n-   Uso\n\nEste manual web es un compendio de códigos que se utilizaran a lo largo del curso. Se sugiere tener descargados los mismos previamente a la clase para poder ir reproduciendo simultaneamente.\n\n> \"The cornerstone of epidemic analysis\" \\hfill --- Campbell and Neher, 1994\n\n![](fig/cornerstone.png)\n",
+    "supporting": [
+      "index_files"
+    ],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {
+      "knitr": [
+        "{\"type\":\"list\",\"attributes\":{},\"value\":[]}"
+      ]
+    },
+    "preserve": null,
+    "postProcess": false
+  }
+}

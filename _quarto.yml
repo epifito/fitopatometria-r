@@ -2,10 +2,17 @@ project:
   type: book
   output-dir: _book
   
+execute:
+  freeze: auto  
+  
 book:
+  
+  google-analytics: "G-3EEM211S00"
   title: "Fitopatometria-r"
-  author: "Epifito"
-  date: ""
+  author: "Juan Edwards"
+  search: true
+  cover-image: cornerstone_hand.png
+  
   chapters:
     - index.qmd
     - intro.qmd
@@ -16,7 +23,11 @@ bibliography: references.bib
 
 format:
   html:
-    theme: cosmo
+    toc: true
+    toc-depth: 5
+    theme: 
+      light: cosmo
+   
   pdf:
     documentclass: scrreprt
 

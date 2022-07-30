@@ -1,3 +1,6 @@
+
+> "The cornerstone of epidemic analysis" `r tufte::quote_footer('--- Campbell and Neher, 1994')`
+
 # Bienvenid\@s {.unnumbered}
 
 -   Objetivos
@@ -12,6 +15,4 @@ Agrónomos, Biologos, Biotecnologos, etc, con conocimientos básicos sobre R.
 
 Este manual web es un compendio de códigos que se utilizaran a lo largo del curso. Se sugiere tener descargados los mismos previamente a la clase para poder ir reproduciendo simultaneamente.
 
-> "The cornerstone of epidemic analysis" `r tufte::quote_footer('--- Campbell and Neher, 1994')`
 
-![](fig/cornerstone.png)
