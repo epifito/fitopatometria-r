@@ -1,18 +1,15 @@
-
 > "The cornerstone of epidemic analysis" `r tufte::quote_footer('--- Campbell and Neher, 1994')`
 
 # Bienvenid\@s {.unnumbered}
 
--   Objetivos
+## Objetivos {.unnumbered}
 
 Familiarizar al alumnado con herramientas (paquetes) del software R para manipular datos fitopatométricos.
 
--   Destinatarios
+## Destinatarios {.unnumbered}
 
-Agrónomos, Biologos, Biotecnologos, etc, con conocimientos básicos sobre R.
+Agrónomos, Biólogos, Biotecnologos, y áreas afines a la fitopatología, con conocimientos básicos sobre R.
 
--   Uso
+## Uso {.unnumbered}
 
 Este manual web es un compendio de códigos que se utilizaran a lo largo del curso. Se sugiere tener descargados los mismos previamente a la clase para poder ir reproduciendo simultaneamente.
-
-

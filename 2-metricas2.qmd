@@ -1,0 +1,232 @@
+# Métricas compuestas
+
+```{r include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      warning = FALSE, 
+                      message = FALSE, 
+                      eval=FALSE, 
+                      fig.width = 12, 
+                      fig.height = 8)
+```
+
+
+```{r include=FALSE}
+# Setup
+# if (!require("pacman")) install.packages("pacman")
+pacman::p_load(tidyverse, epifitter)
+theme_set(theme_light()) 
+
+```
+
+## AUC
+
+Area bajo la curva de progreso de la enfermedad
+
+Reproducción de: https://apsjournals.apsnet.org/doi/10.1094/PHYTOFR-11-20-0033-A 
+
+
+```{r}
+epi <- tibble(
+  time = c(1,2,3,4), 
+  dis = c(1,2,3,10)
+)
+```
+
+```{r}
+epi %>%  
+  ggplot()+
+  aes(x=time, y = dis)+
+  geom_point()+
+  geom_line()
+```
+
+Area under the disease progress curve (AUDPC) - Absoluta
+
+```{r}
+audpc_1  <- with(epi, 
+                 AUDPC(time = time, 
+                  y = dis, 
+                  y_proportion = FALSE, 
+                  type = "absolute"))  
+audpc_1
+```
+
+Area under the disease progress stairs (AUDPS) - Absoluta
+
+```{r}
+audps_1  <- with(epi, 
+                 AUDPS(time = time, y = dis, y_proportion = FALSE, 
+                  type = "absolute"))
+audps_1
+```
+
+AUC standarizada
+
+```{r}
+sAUDPC <- audpc_1/(4-1)
+sAUDPC
+```
+
+```{r}
+sAUDPS <- audps_1 * (4-1) / ((4-1)*4)
+sAUDPS
+```
+
+Aplicación a un caso real
+
+Reproducción de:  https://www.apsnet.org/edcenter/disimpactmngmnt/topc/EcologyAndEpidemiologyInR/DiseaseProgress/Pages/StripeRust.aspx
+
+
+```{r}
+## Set up vector for Madras AUDPC Chart
+dat <- tibble(
+  dai = c(0,10,20,30,40,50,60,70,80,90,100), 
+  sev_68 = c(0,0,0,0,3,20,50,80, 90, 100, 100), 
+  sev_69 = c( 0,0,0,0,0,0,0,3,6,30,70)
+)
+dat
+```
+
+```{r}
+dat %>%  
+  ggplot()+
+  aes(x = dai) +
+  geom_line(aes(y = sev_68), col="red")+
+  geom_line(aes(y = sev_69), col="blue")
+```
+
+
+```{r}
+# Epidemia de 1968
+AUDPC(time = dat$dai, 
+      y = dat$sev_68, 
+      y_proportion = FALSE, 
+      type = "absolute")
+```
+
+```{r}
+# Epidemia de 1969
+AUDPC(time = dat$dai, 
+      y = dat$sev_69, 
+      y_proportion = FALSE, 
+      type = "absolute")
+```
+
+```{r}
+# un poco de coding
+dat %>%  
+  pivot_longer(
+    cols= c(sev_68, sev_69), 
+    names_to = "epidemia", 
+    values_to = "sev", 
+    names_prefix = "sev_")-> dat_long
+```
+
+```{r}
+# dat_long %>%  
+#   ggplot()+
+#   aes(x = dai, y = sev, col=epidemia) +
+#   geom_line()
+```
+
+```{r}
+dat_long %>%  
+  group_by(epidemia) %>%  
+  summarise(abc=AUDPC(time = dai, 
+                        y = sev, 
+                        y_proportion = FALSE, 
+                        type = "absolute"))
+```
+
+
+```{r, include=FALSE}
+pacman::p_load(tidyverse, emmeans)
+load("data/data.RData")
+```
+
+## DSI 
+
+Disease severity index (Indice de severidad)
+
+* Poroto/sclerotinia 
+
+```{r}
+poroto
+```
+ 
+Dataset de formato wide, que incluye 3 variables descriptivas y 4 variables respuesta. 
+
+```{r}
+poroto %>% 
+  mutate(diseased = rowSums(dplyr::select(., matches('1|2|3|4')))) %>% 
+  mutate(inc = diseased/n*100) %>% 
+  mutate(dsi_eq1 = (1*class_1+2*class_2+3*class_3+4*class_4)/(n*4) *100) %>% 
+  mutate(dsi_eq2 = (1*class_1+2*class_2+3*class_3+4*class_4)/n) %>% 
+  mutate(dsi_midpoint = (.13*class_1 +.375*class_2 + .625*class_3 + .875*class_4)/n*100)%>% 
+  mutate_at(vars(trt, rep), as.factor) -> poroto_dsi
+```
+
+Print 
+
+```{r}
+poroto_dsi
+```
+
+Model fitting 
+
+```{r}
+mod0 <- lm(dsi_midpoint ~ trt, data = poroto_dsi)
+par(mfrow = c(1, 2))
+plot(mod0, which = c(1,2))
+```
+
+```{r}
+layout(1)
+MASS::boxcox(mod0)
+locator()
+# plot(fitted(mod0), resid(mod0), xlab = "Fitted", ylab = "Residuals")
+# abline(h = 0, lty = 2, col = "darkorange", lwd = 2)
+# plot(mod0, which = c(1))
+```
+
+```{r}
+mod1 <- lm(sqrt(dsi_midpoint) ~ trt, data = poroto_dsi)
+par(mfrow = c(1, 2))
+plot(mod1, which = c(1,2))
+MASS::boxcox(mod1)
+```
+
+```{r}
+bctran <- make.tran("boxcox", 0.596)
+mod2 <- with(bctran,
+            lm(linkfun(dsi_midpoint) ~ trt, data = poroto_dsi))
+par(mfrow = c(1, 2))
+plot(mod2, which = c(1,2))
+```
+
+```{r}
+asin_tran <- make.tran("asin.sqrt", 100)
+mod3 <- with(asin_tran,
+            lm(linkfun(dsi_midpoint) ~ trt, data = poroto_dsi)
+            )
+par(mfrow = c(1, 2))
+plot(mod3, which = c(1,2))
+emmeans(mod3, ~ trt, type = "response")
+
+```
+
+
+```{r}
+poroto_dsi_p = transform(poroto_dsi, p = (dsi_midpoint/100))
+
+mod4 = lm(log(p/(1-p)) ~ trt, data = poroto_dsi_p)
+emmeans(mod4, ~trt, 
+        tran = "logit", at = list(dsi_midpoint = 3:81), 
+        type = "response")
+```
+
+```{r}
+AIC(mod1, mod2, mod3, mod4)
+```
+
+

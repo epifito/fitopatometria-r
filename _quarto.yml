@@ -8,19 +8,23 @@ execute:
 book:
   
   google-analytics: "G-3EEM211S00"
-  title: "Fitopatometria-r"
-  author: "Juan Edwards"
+  title: "Fitopatometria |> R"
+  author: "Epifito"
   search: true
   cover-image: cornerstone_hand.png
   
   chapters:
     - index.qmd
-    - intro.qmd
-    - summary.qmd
-    - references.qmd
+    - 1-metricas.qmd
+    # - 2-metricas2.qmd
+    # - 3-glm.qmd
+    # - 4-pliman.qmd
+    # - 5-escalaa.qmd
+    # - 6-ec50.qmd
+    - referencias.qmd
 
 bibliography: references.bib
-
+csl: phytopathology.csl
 format:
   html:
     toc: true
@@ -30,6 +34,5 @@ format:
    
   pdf:
     documentclass: scrreprt
-
 
 

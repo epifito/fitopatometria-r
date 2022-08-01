@@ -1,7 +1,4 @@
 - source: project
-  quarto-pub:
-    - id: bdd2b3d4-508c-4e7b-9680-be303a845f76
-      url: 'https://quartopub.org/sites/epifito/fitopatometria-r'
   netlify:
     - id: 281f60ca-ab24-4694-bb88-eb7d5781f7ef
       url: 'https://fitopatometria.netlify.app'

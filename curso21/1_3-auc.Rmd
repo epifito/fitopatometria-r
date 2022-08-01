@@ -1,0 +1,215 @@
+```{r include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      warning = FALSE, 
+                      message = FALSE, 
+                      eval=FALSE, 
+                      fig.width = 12, 
+                      fig.height = 8)
+options(width = 90)
+```
+
+# AUC
+
+Area bajo la curva de progreso de la enfermedad
+
+Reproducción de: https://apsjournals.apsnet.org/doi/10.1094/PHYTOFR-11-20-0033-A 
+
+```{r}
+# install.packages("pacman")
+pacman::p_load(tidyverse, epifitter)
+```
+
+```{r}
+time = c(1,2,3,4)
+y = c(1,2,3,10)
+```
+
+Area under the disease progress curve (AUDPC) - Absoluta
+
+```{r}
+audpc_1  <- AUDPC(time = time, y = y, 
+                  y_proportion = FALSE, 
+                  type = "absolute")
+audpc_1
+```
+
+Area under the disease progress stairs (AUDPS) - Absoluta
+
+```{r}
+audps_1  <- AUDPS(time = time, y = y, y_proportion = FALSE, 
+                  type = "absolute")
+audps_1
+```
+
+AUC standarizada
+
+```{r}
+sAUDPC <- audpc_1/(4-1)
+sAUDPC
+```
+
+```{r}
+sAUDPS <- audps_1 * (4-1) / ((4-1)*4)
+sAUDPS
+```
+
+AUDPC relativa
+
+```{r}
+audpc_max <- 10*(4-1)
+(rAUDPC <- audpc_1/audpc_max)
+```
+
+AUDPS relativa
+```{r}
+audps_max <- 10*(4)
+(rAUDPC <- audps_1/audps_max)
+```
+
+
+Aplicación a un caso real
+
+```{r}
+load("data/data.RData")
+```
+
+Dataset `canola` 
+
+Experimento de canola conducido en Balcarce, donde fueron testeados 10 fungicidas (mas un control sin protección con fungicida) con 3 bloques en el cual se registró el progreso de la incidencia de manchas foliares de Phoma lingam a través del tiempo (tiempo térmico desde la detección de la primera mancha)
+
+```{r}
+canola %>% 
+  janitor::tabyl(trt, bk)
+```
+
+```{r}
+canola %>%  
+  pivot_longer(
+    cols= inc_15:inc_248, 
+    names_to = "tt", 
+    values_to = "inc", 
+    names_prefix = "inc_")-> can_long
+```
+
+```{r}
+can_long
+```
+
+
+```{r}
+can_long <- can_long %>% 
+  mutate_at(vars(tt), as.numeric)
+
+can_long
+```
+
+```{r}
+can_long %>%   
+  unite("par", trt, bk, remove = FALSE) %>% 
+  ggplot()+ 
+  aes(x=tt, y=inc)+ 
+  geom_line()+
+  facet_wrap("par")
+```
+
+Calcularemos un valor de AUC por parcela con auxilio de las funciones `group_by` y `summarize` 
+
+```{r}
+can_long %>%
+  group_by(trt, bk) %>%
+  summarize(auc = AUDPC(time = tt, 
+                        y = inc, 
+                        y_proportion = FALSE, 
+                        type = "absolute")) -> can_auc
+```
+
+Chequeamos str del nuevo dataset, que entrara al modelado
+
+```{r}
+can_auc
+```
+
+```{r}
+can_auc <- can_auc %>% 
+  mutate_at(vars(trt, bk), as.factor)
+```
+
+```{r}
+can_auc %>% 
+  ggplot()+
+  aes(y=auc,x=trt, col=bk)+
+  geom_point()
+```
+
+Model fitting 
+
+```{r}
+pacman::p_load(emmeans, multcomp, scales)
+```
+
+```{r}
+mod_canola <- lm(auc ~ trt + bk, data = can_auc)
+```
+
+```{r}
+par(mfrow = c(1, 2))
+plot(mod_canola, which = c(1,2))
+```
+
+```{r}
+MASS::boxcox(mod_canola)
+```
+
+```{r}
+mod_canola1 <- lm(log(auc) ~ trt + bk, data = can_auc)
+```
+
+```{r}
+par(mfrow = c(2, 2))
+plot(mod_canola, which = c(1,2))
+plot(mod_canola1, which = c(1,2))
+```
+
+```{r}
+layout(1)
+MASS::boxcox(mod_canola1)
+```
+
+Estimamos las medias ajustadas por el modelo
+
+```{r}
+em <- emmeans(mod_canola1, ~trt, type = "response")
+```
+
+Hacemos las comparaciones multiples segun test de Tukey
+
+```{r}
+res <- multcomp::cld(em, 
+                     Letters = letters, 
+                     alpha = .05, 
+                     reversed = F) 
+res
+```
+
+```{r}
+plot(res, alpha =0.5) + 
+  geom_vline(xintercept = res %>% 
+               filter(trt==1) %>% 
+               pull(response), 
+             linetype = 2, col ="gray50")+
+  geom_point(data = can_auc, 
+             aes(x = auc, 
+                 y = trt), pch=21, 
+             position=position_dodge(width=1), size = 2) +
+  geom_text(data = res, angle=90, vjust=-0.7,
+            aes(x = response,
+                y = trt,
+                label = .group),
+            size = 4)+
+  labs(x="AUC incidencia de maculas", 
+       y = "Tratamiento") +   
+  scale_x_continuous(breaks=scales::pretty_breaks())+
+  theme_bw()+
+  coord_flip()
+```
+

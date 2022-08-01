@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Juan Edwards">
+<meta name="author" content="Epifito">
 
-<title>Fitopatometria-r</title>
+<title>Fitopatometria |&gt; R</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -26,7 +26,7 @@ ul.task-list{list-style: none;}
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./intro.html" rel="next">
+<link href="./1-metricas.html" rel="next">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -74,7 +74,7 @@ gtag('config', 'G-3EEM211S00', { 'anonymize_ip': true});
   <header id="quarto-header" class="headroom fixed-top">
   <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
     <div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title">Fitopatometria-r</h1>
+      <h1 class="quarto-secondary-nav-title">Fitopatometria |&gt; R</h1>
       <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
         <i class="bi bi-chevron-right"></i>
       </button>
@@ -87,7 +87,7 @@ gtag('config', 'G-3EEM211S00', { 'anonymize_ip': true});
   <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">Fitopatometria-r</a> 
+      <a href="./">Fitopatometria |&gt; R</a> 
     </div>
       </div>
       <div class="mt-2 flex-shrink-0 align-items-center">
@@ -104,17 +104,12 @@ gtag('config', 'G-3EEM211S00', { 'anonymize_ip': true});
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./intro.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction</span></a>
+  <a href="./1-metricas.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Métricas básicas</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./summary.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Summary</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./references.html" class="sidebar-item-text sidebar-link">References</a>
+  <a href="./referencias.html" class="sidebar-item-text sidebar-link">Referencias</a>
   </div>
 </li>
     </ul>
@@ -126,7 +121,12 @@ gtag('config', 'G-3EEM211S00', { 'anonymize_ip': true});
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#bienvenids" id="toc-bienvenids" class="nav-link active" data-scroll-target="#bienvenids">Bienvenid@s</a></li>
+  <li><a href="#bienvenids" id="toc-bienvenids" class="nav-link active" data-scroll-target="#bienvenids">Bienvenid@s</a>
+  <ul class="collapse">
+  <li><a href="#objetivos" id="toc-objetivos" class="nav-link" data-scroll-target="#objetivos">Objetivos</a></li>
+  <li><a href="#destinatarios" id="toc-destinatarios" class="nav-link" data-scroll-target="#destinatarios">Destinatarios</a></li>
+  <li><a href="#uso" id="toc-uso" class="nav-link" data-scroll-target="#uso">Uso</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -135,7 +135,7 @@ gtag('config', 'G-3EEM211S00', { 'anonymize_ip': true});
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title d-none d-lg-block">Fitopatometria-r</h1>
+<h1 class="title d-none d-lg-block">Fitopatometria |&gt; R</h1>
 </div>
 
 
@@ -145,7 +145,7 @@ gtag('config', 'G-3EEM211S00', { 'anonymize_ip': true});
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>Juan Edwards </p>
+             <p>Epifito </p>
           </div>
   </div>
     
@@ -155,7 +155,7 @@ gtag('config', 'G-3EEM211S00', { 'anonymize_ip': true});
 
 </header>
 
-<p><img src="cornerstone_hand.png" title="Fitopatometria-r" class="quarto-cover-image img-fluid"></p>
+<p><img src="cornerstone_hand.png" title="Fitopatometria |> R" class="quarto-cover-image img-fluid"></p>
 <blockquote class="blockquote">
 “The cornerstone of epidemic analysis”
 <footer>
@@ -164,20 +164,20 @@ gtag('config', 'G-3EEM211S00', { 'anonymize_ip': true});
 </blockquote>
 <section id="bienvenids" class="level1 unnumbered">
 <h1 class="unnumbered">Bienvenid@s</h1>
-<ul>
-<li>Objetivos</li>
-</ul>
+<section id="objetivos" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="objetivos">Objetivos</h2>
 <p>Familiarizar al alumnado con herramientas (paquetes) del software R para manipular datos fitopatométricos.</p>
-<ul>
-<li>Destinatarios</li>
-</ul>
-<p>Agrónomos, Biologos, Biotecnologos, etc, con conocimientos básicos sobre R.</p>
-<ul>
-<li>Uso</li>
-</ul>
+</section>
+<section id="destinatarios" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="destinatarios">Destinatarios</h2>
+<p>Agrónomos, Biólogos, Biotecnologos, y áreas afines a la fitopatología, con conocimientos básicos sobre R.</p>
+</section>
+<section id="uso" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="uso">Uso</h2>
 <p>Este manual web es un compendio de códigos que se utilizaran a lo largo del curso. Se sugiere tener descargados los mismos previamente a la clase para poder ir reproduciendo simultaneamente.</p>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
@@ -282,8 +282,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   <div class="nav-page nav-page-previous">
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./intro.html" class="pagination-link">
-        <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./1-metricas.html" class="pagination-link">
+        <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Métricas básicas</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
