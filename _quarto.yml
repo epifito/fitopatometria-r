@@ -6,13 +6,9 @@ execute:
   freeze: auto  
   
 book:
-  
   google-analytics: "G-3EEM211S00"
   title: "Fitopatometria |> R"
-  author:
-    - Juan Edwards [INTA Balcarce, edwardsmolina@gmail.com]
-    - Juan Paredes [INTA/IPAVE, brunodp385@gmail.com]
-    - Bruno Pugliese [INTA/IPAVE, juanchiap@gmail.com]
+  author: "  - Juan Edwards, Juan Paredes y Bruno Pugliese"
   search: true
   cover-image: cornerstone_hand.png
   
