@@ -9,7 +9,10 @@ book:
   
   google-analytics: "G-3EEM211S00"
   title: "Fitopatometria |> R"
-  author: "Epifito"
+  author:
+    - Juan Edwards [INTA Balcarce, edwardsmolina@gmail.com]
+    - Juan Paredes [INTA/IPAVE, brunodp385@gmail.com]
+    - Bruno Pugliese [INTA/IPAVE, juanchiap@gmail.com]
   search: true
   cover-image: cornerstone_hand.png
   

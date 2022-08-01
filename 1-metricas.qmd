@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE,
 ```
 
 
-```{r include=FALSE}
+```{r}
 # Setup
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(tidyverse)
@@ -62,9 +62,9 @@ inc <- binomial2/10
 sqrt(10*0.3*0.7)
 ```
 
-Disribucion beta para proporciones, limitada entre 0 y 1:  
+Disribución beta para proporciones, limitada entre 0 y 1:  
 
-- incidencia (o prevalencia) de la enfermedad a nivel de muestra o población: proporción de individuos enfermos. 
+- Incidencia (o prevalencia) de la enfermedad a nivel de muestra o población: proporción de individuos enfermos. 
 - Severidad: expresada como proporción del área del órgano afectado. 
 
 ```{r}
@@ -129,6 +129,7 @@ Para eso carguemos el dataset Olivo/bacteriosis
 
 ```{r}
 load("data/data.RData")
+olivo |> rio::export("data/olivo.csv")
 olivo %>%  view() 
 ```
 
