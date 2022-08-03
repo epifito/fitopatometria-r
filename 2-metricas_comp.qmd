@@ -125,9 +125,8 @@ dat_long %>%
 ```
 
 
-```{r, include=FALSE}
-pacman::p_load(tidyverse, emmeans)
-load("data/data.RData")
+```{r}
+poroto <- read.csv("https://raw.githubusercontent.com/epifito/fitopatometria-r/main/data/poroto.csv")
 ```
 
 ## DSI 
@@ -228,7 +227,13 @@ Estimacion de AF activa (lo que no es senescencia)
 La senescencia no cuenta para ninguna enfermedad, ya que es imposible distinguir su causa.
 
 ```{r}
-cebada  <- rio::import("data/cebada_redu.csv")
+# cebada  |> 
+#   mutate_if(is.numeric, round) |> 
+#   rio::export("data/cebada_redu.csv")
+# 
+# cebada  <- rio::import("data/cebada_redu.csv")
+cebada <- read.csv("https://raw.githubusercontent.com/epifito/fitopatometria-r/main/data/cebada_redu.csv")
+
 ```
 
 Hacemos un cebada long solo con fines graficos, entonces no creamos `cebada_long`. 
@@ -261,7 +266,7 @@ cebada %>%
 Ahora calculamos el AF sana (%), restando al AF activa, la severidad media de mancha en red y escaldadura.
 
 ```{r}
-cebada <- cebada %>% 
+cebada <- cebada_raw %>% 
   mutate(af_sana = verdor - e1_sev - e2_sev) %>% 
   mutate(sev_tot = e1_sev + e2_sev) 
 cebada
