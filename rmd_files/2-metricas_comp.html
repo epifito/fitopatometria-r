@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Fitopatometria |&gt; R - 2&nbsp; Métricas compuestas</title>
+<title>metricas_comp</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -81,146 +81,37 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<link href="./referencias.html" rel="next">
-<link href="./1-metricas.html" rel="prev">
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
-<script id="quarto-search-options" type="application/json">{
-  "location": "sidebar",
-  "copy-button": false,
-  "collapse-after": 3,
-  "panel-placement": "start",
-  "type": "textbox",
-  "limit": 20,
-  "language": {
-    "search-no-results-text": "No results",
-    "search-matching-documents-text": "matching documents",
-    "search-copy-link-title": "Copy link to search",
-    "search-hide-matches-text": "Hide additional matches",
-    "search-more-match-text": "more match in this document",
-    "search-more-matches-text": "more matches in this document",
-    "search-clear-button-title": "Clear",
-    "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit"
-  }
-}</script>
-<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-3EEM211S00"></script>
-
-<script type="text/javascript">
-
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', 'G-3EEM211S00', { 'anonymize_ip': true});
-</script>
+<script src="2-metricas_comp_files/libs/clipboard/clipboard.min.js"></script>
+<script src="2-metricas_comp_files/libs/quarto-html/quarto.js"></script>
+<script src="2-metricas_comp_files/libs/quarto-html/popper.min.js"></script>
+<script src="2-metricas_comp_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="2-metricas_comp_files/libs/quarto-html/anchor.min.js"></script>
+<link href="2-metricas_comp_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="2-metricas_comp_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="2-metricas_comp_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="2-metricas_comp_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="2-metricas_comp_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 
 
 </head>
 
-<body class="nav-sidebar floating">
+<body class="fullcontent">
 
-<div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top">
-  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-    <div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Métricas compuestas</span></h1>
-      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
-        <i class="bi bi-chevron-right"></i>
-      </button>
-    </div>
-  </nav>
-</header>
-<!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
-<!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
-    <div class="pt-lg-2 mt-2 text-left sidebar-header">
-    <div class="sidebar-title mb-0 py-0">
-      <a href="./">Fitopatometria |&gt; R</a> 
-    </div>
-      </div>
-      <div class="mt-2 flex-shrink-0 align-items-center">
-        <div class="sidebar-search">
-        <div id="quarto-search" class="" title="Search"></div>
-        </div>
-      </div>
-    <div class="sidebar-menu-container"> 
-    <ul class="list-unstyled mt-1">
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link">Bienvenid@s</a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./1-metricas.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Métricas básicas</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./2-metricas_comp.html" class="sidebar-item-text sidebar-link active"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Métricas compuestas</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./referencias.html" class="sidebar-item-text sidebar-link">Referencias</a>
-  </div>
-</li>
-    </ul>
-    </div>
-</nav>
-<!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc">
-    <h2 id="toc-title">Table of contents</h2>
-   
-  <ul>
-  <li><a href="#auc" id="toc-auc" class="nav-link active" data-scroll-target="#auc"> <span class="header-section-number">2.1</span> AUC</a></li>
-  <li><a href="#dsi" id="toc-dsi" class="nav-link" data-scroll-target="#dsi"> <span class="header-section-number">2.2</span> DSI</a></li>
-  <li><a href="#enfermedades-que-inducen-senescencia" id="toc-enfermedades-que-inducen-senescencia" class="nav-link" data-scroll-target="#enfermedades-que-inducen-senescencia"> <span class="header-section-number">2.3</span> Enfermedades que inducen senescencia</a></li>
-  </ul>
-</nav>
-    </div>
-<!-- main -->
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title d-none d-lg-block"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Métricas compuestas</span></h1>
-</div>
 
 
-
-<div class="quarto-title-meta">
-
-    
-    
-  </div>
-  
-
-</header>
-
+<section id="métricas-compuestas" class="level1">
+<h1>Métricas compuestas</h1>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># if (!require("pacman")) install.packages("pacman")</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(tidyverse, epifitter, emmeans, performance, ggResidpanel, multcomp, multcompView)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_light</span>()) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<section id="auc" class="level2" data-number="2.1">
-<h2 data-number="2.1" class="anchored" data-anchor-id="auc"><span class="header-section-number">2.1</span> AUC</h2>
+<section id="auc" class="level2">
+<h2 class="anchored" data-anchor-id="auc">AUC</h2>
 <p>Area bajo la curva de progreso de la enfermedad</p>
 <p>Reproducción de: <a href="https://www.apsnet.org/edcenter/disimpactmngmnt/topc/EcologyAndEpidemiologyInR/DiseaseProgress/Pages/AUDPC.aspx">APS-AUDPC</a></p>
 <div class="cell">
@@ -307,8 +198,8 @@ gtag('config', 'G-3EEM211S00', { 'anonymize_ip': true});
 <span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>                        <span class="at">type =</span> <span class="st">"absolute"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="dsi" class="level2" data-number="2.2">
-<h2 data-number="2.2" class="anchored" data-anchor-id="dsi"><span class="header-section-number">2.2</span> DSI</h2>
+<section id="dsi" class="level2">
+<h2 class="anchored" data-anchor-id="dsi">DSI</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># poroto  &lt;-  rio::import("data/poroto.csv")</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>poroto <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"https://raw.githubusercontent.com/epifito/fitopatometria-r/main/data/poroto.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -381,8 +272,8 @@ gtag('config', 'G-3EEM211S00', { 'anonymize_ip': true});
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">compare_performance</span>(mod1, mod2, mod3, mod4)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="enfermedades-que-inducen-senescencia" class="level2" data-number="2.3">
-<h2 data-number="2.3" class="anchored" data-anchor-id="enfermedades-que-inducen-senescencia"><span class="header-section-number">2.3</span> Enfermedades que inducen senescencia</h2>
+<section id="enfermedades-que-inducen-senescencia" class="level2">
+<h2 class="anchored" data-anchor-id="enfermedades-que-inducen-senescencia">Enfermedades que inducen senescencia</h2>
 <p>Ensayo de fungicidas en cebada (trt=3). DBCA con 4 rep. Evaluaciones de sev media a los 0, 9, 20 y 29 dias desde aplicado. Estimacion de AF activa (lo que no es senescencia) La senescencia no cuenta para ninguna enfermedad, ya que es imposible distinguir su causa.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>cebada_raw <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"https://raw.githubusercontent.com/epifito/fitopatometria-r/main/data/cebada_redu.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -440,11 +331,11 @@ gtag('config', 'G-3EEM211S00', { 'anonymize_ip': true});
 <span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">aes</span>(<span class="at">y=</span>auc, <span class="at">x=</span>trt, <span class="at">col=</span>rep)<span class="sc">+</span></span>
 <span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-
-
+</section>
 </section>
 
-</main> <!-- /main -->
+</main>
+<!-- /main column -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
@@ -542,18 +433,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
-<nav class="page-navigation">
-  <div class="nav-page nav-page-previous">
-      <a href="./1-metricas.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Métricas básicas</span></span>
-      </a>          
-  </div>
-  <div class="nav-page nav-page-next">
-      <a href="./referencias.html" class="pagination-link">
-        <span class="nav-page-text">Referencias</span> <i class="bi bi-arrow-right-short"></i>
-      </a>
-  </div>
-</nav>
 </div> <!-- /content -->
 
 
