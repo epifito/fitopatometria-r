@@ -231,13 +231,11 @@ La senescencia no cuenta para ninguna enfermedad, ya que es imposible distinguir
 #   mutate_if(is.numeric, round) |> 
 #   rio::export("data/cebada_redu.csv")
 # 
-# cebada  <- rio::import("data/cebada_redu.csv")
+cebada  <- rio::import("data/cebada_redu.csv")
 cebada <- read.csv("https://raw.githubusercontent.com/epifito/fitopatometria-r/main/data/cebada_redu.csv")
-
 ```
 
 Hacemos un cebada long solo con fines graficos, entonces no creamos `cebada_long`. 
-
 ```{r}
 cebada %>% 
   pivot_longer(
