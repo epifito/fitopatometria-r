@@ -15,7 +15,7 @@ book:
   chapters:
     - index.qmd
     - 1-metricas.qmd
-    # - 2-metricas2.qmd
+    - 2-metricas_comp.qmd
     # - 3-glm.qmd
     # - 4-pliman.qmd
     # - 5-escalaa.qmd
