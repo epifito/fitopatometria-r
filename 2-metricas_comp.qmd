@@ -9,7 +9,6 @@ knitr::opts_chunk$set(echo = TRUE,
                       fig.height = 8)
 ```
 
-
 ```{r Setup}
 # if (!require("pacman")) install.packages("pacman")
 pacman::p_load(tidyverse, epifitter, emmeans, performance, ggResidpanel, multcomp, multcompView)
@@ -20,8 +19,7 @@ theme_set(theme_light())
 
 Area bajo la curva de progreso de la enfermedad
 
-Reproducción de: https://apsjournals.apsnet.org/doi/10.1094/PHYTOFR-11-20-0033-A 
-
+Reproducción de: [APS Stripe rust](https://apsjournals.apsnet.org/doi/10.1094/PHYTOFR-11-20-0033-A)
 
 ```{r}
 epi <- tibble(
@@ -57,8 +55,7 @@ sabc1
 
 Aplicación a un caso real
 
-Reproducción de:  https://www.apsnet.org/edcenter/disimpactmngmnt/topc/EcologyAndEpidemiologyInR/DiseaseProgress/Pages/StripeRust.aspx
-
+Reproducción de: [APS Stripe rust](https://www.apsnet.org/edcenter/disimpactmngmnt/topc/EcologyAndEpidemiologyInR/DiseaseProgress/Pages/StripeRust.aspx)
 
 ```{r}
 ## Set up vector for Madras AUDPC Chart
@@ -77,7 +74,6 @@ dat %>%
   geom_line(aes(y = sev_68), col="red")+
   geom_line(aes(y = sev_69), col="blue")
 ```
-
 
 ```{r}
 # Epidemia de 1968
@@ -124,23 +120,18 @@ dat_long %>%
                         type = "absolute"))
 ```
 
+## DSI
 
 ```{r}
+# poroto  <-  rio::import("data/poroto.csv")
 poroto <- read.csv("https://raw.githubusercontent.com/epifito/fitopatometria-r/main/data/poroto.csv")
 ```
 
-## DSI 
-
 Disease severity index (Indice de severidad)
 
-* Poroto/sclerotinia 
+-   Poroto/sclerotinia
 
-```{r}
-poroto %>%  rio::export("data/poroto.csv")
-poroto  <-  rio::import("data/poroto.csv")
-```
- 
-Dataset de formato wide, que incluye 3 variables descriptivas y 4 variables respuesta. 
+Dataset de formato wide, que incluye 3 variables descriptivas y 4 variables respuesta.
 
 ```{r}
 poroto %>% 
@@ -154,7 +145,6 @@ poroto %>%
 poroto_dsi
 ```
 
-
 ```{r}
 poroto_dsi %>%  
   ggplot() + 
@@ -162,7 +152,7 @@ poroto_dsi %>%
   geom_point(alpha=.3)
 ```
 
-Model fitting 
+Model fitting
 
 ```{r}
 mod1 <- lm(dsi ~ trt, data = poroto_dsi)
@@ -174,7 +164,6 @@ check_heteroscedasticity(mod1)
 check_normality(mod1)
 cld(emmeans(mod1, ~ trt, type = "response"))
 ```
-
 
 ```{r}
 mod2 <- lm(sqrt(dsi) ~ trt, data = poroto_dsi)
@@ -220,22 +209,18 @@ compare_performance(mod1, mod2, mod3, mod4)
 
 ## Enfermedades que inducen senescencia
 
-Ensayo de fungicidas en cebada (trt=3). 
-DBCA con 4 rep.
-Evaluaciones de sev media a los 0, 9, 20 y 29 dias desde aplicado. 
-Estimacion de AF activa (lo que no es senescencia)
-La senescencia no cuenta para ninguna enfermedad, ya que es imposible distinguir su causa.
+Ensayo de fungicidas en cebada (trt=3). DBCA con 4 rep. Evaluaciones de sev media a los 0, 9, 20 y 29 dias desde aplicado. Estimacion de AF activa (lo que no es senescencia) La senescencia no cuenta para ninguna enfermedad, ya que es imposible distinguir su causa.
+
+```{r, include =FALSE}
+# cebada_raw  <- rio::import("data/cebada_redu.csv")
+```
 
 ```{r}
-# cebada  |> 
-#   mutate_if(is.numeric, round) |> 
-#   rio::export("data/cebada_redu.csv")
-# 
-cebada_raw  <- rio::import("data/cebada_redu.csv")
 cebada_raw <- read.csv("https://raw.githubusercontent.com/epifito/fitopatometria-r/main/data/cebada_redu.csv")
 ```
 
-Hacemos un cebada long solo con fines graficos, entonces no creamos `cebada_long`. 
+Hacemos un cebada long solo con fines graficos, entonces no creamos `cebada_long`.
+
 ```{r}
 cebada_long <- cebada_raw %>% 
   pivot_longer(
