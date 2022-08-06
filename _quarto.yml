@@ -16,7 +16,7 @@ book:
     - index.qmd
     - 1-metricas.qmd
     - 2-metricas_comp.qmd
-    # - 3-glm.qmd
+    - 3-glm_binomial.qmd
     # - 4-pliman.qmd
     # - 5-escalaa.qmd
     # - 6-ec50.qmd
