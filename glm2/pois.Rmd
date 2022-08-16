@@ -1,0 +1,41 @@
+```{r}
+library(tidyverse)
+u <- "https://raw.githubusercontent.com/facuxpalacio/Curso_modelos_lineales_y_aditivos_en_ecologia_2022/main/datos/hormigas.txt"
+h <- read.table(u, header = T) 
+h
+```
+
+
+```{r}
+h %>% 
+  count(Srich) %>% 
+  ggplot(aes(x=n)) + 
+  geom_histogram()
+```
+
+```{r}
+m.pois <- glm(Srich ~ Latitude + Habitat, family = poisson, data = h)
+summary(m.pois)
+```
+
+```{r}
+library(DHARMa)
+testDispersion(m.pois)
+plot(simulateResiduals(fittedModel = m.pois))
+```
+
+```{r}
+m.qpois <- glm(Srich ~ Latitude + Elevation + Habitat, family = quasipoisson, data = h)
+```
+
+```{r}
+library(equatiomatic)
+extract_eq(m.pois, use_coefs = TRUE, fix_signs = TRUE)
+```
+
+```{r}
+library(sjPlot)
+plot_model(m.qpois, type='pred', show.data=T, ci.lvl = NA)
+summary(m.pois)
+```
+

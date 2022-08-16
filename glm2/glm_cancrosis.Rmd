@@ -1,0 +1,204 @@
+
+```{r}
+pacman::p_load(
+  tidyverse,
+  skimr, janitor,# exploracion de los datos
+  lme4, gamlss,  # modelado
+  ggResidpanel,  # diagnostico 
+  DHARMa, 
+  performance,   # evaluar performance de los modelos
+  emmeans,       # medias estimadas por el modelo  
+  multcomp       # comparar las medias entre si - tukey
+  )
+conflicted::conflict_prefer("select", "dplyr")
+conflicted::conflict_prefer("filter", "dplyr")
+```
+
+
+```{r}
+load("glm2/data_diana.rsd")
+# dat %>% rio::export("diana/diana_dat.csv")
+# long %>% rio::export("diana/diana_long.csv")
+# dat <- read.csv("https://raw.githubusercontent.com/juanchiem/agro_data/master/diana_dat.csv") %>% 
+#   mutate_at(vars(var, dias, trt), as.factor) 
+str(dat)
+  
+long <- read.csv("https://raw.githubusercontent.com/juanchiem/agro_data/master/diana_long.csv") %>% 
+    mutate_at(vars(var, dias, trt), as.factor) 
+```
+
+```{r}
+theme_set(theme_bw()+theme(panel.spacing=grid::unit(0,"lines")))
+mycols <- colorRampPalette(c("red2", "orange", "gold1", "forestgreen"))
+myvals <- c(0, .25, .5, .75, 1)
+```
+
+# Exploracion 
+
+```{r}
+ftable(xtabs(~var+trt+dias+pl, dat))
+```
+
+```{r,  eval=FALSE}
+long %>% 
+  group_by(var, dias, categ) %>% 
+  summarise(cont = sum(cont))
+
+long %>% 
+  group_by(var, trt, dias, categ) %>% 
+  summarise(cont = sum(cont)) %>% 
+  mutate(categ_bin = ifelse(categ == 0, 0, 1)) %>%  
+  group_by(var, trt, dias, categ_bin) %>% 
+  summarise(cont = sum(cont))  
+```
+
+# Visualizacion 
+
+Escala de evaluacion 
+
+```{r}
+long |>    
+  ggplot(aes(x=trt, y=prop, fill=fct_rev(factor(categ))))+ 
+  facet_grid(var ~ dias, 
+             labeller = label_both)+
+  geom_bar(position="fill", stat="identity")+
+  scale_fill_manual(values=mycols(6), name="Escala sev")  #
+```
+
+Incidencia
+
+```{r}
+long %>% 
+  group_by(var, trt, dias, categ) %>% 
+  summarise(cont = sum(cont)) %>% 
+  mutate(categ_bin = ifelse(categ == 0, 0, 1)) %>%  
+  group_by(var, trt, dias, categ_bin) %>% 
+  summarise(cont = sum(cont))  %>%
+  group_by(var, trt, dias) %>% 
+  mutate(prop = cont/sum(cont)) %>%
+  ggplot() + 
+  aes(trt, prop, fill=fct_rev(factor(categ_bin))) + 
+  geom_col() + 
+  facet_grid(var ~ dias, 
+             labeller = label_both)+
+  scale_fill_manual(values=mycols(2), name="Sano/enfermo")  #
+```
+
+Indice de severidad
+
+```{r}
+dat %>% 
+  ggplot(aes(x=dias, y=dsi, group=factor(trt) , col= factor(trt)))+ 
+  facet_wrap("var")+
+  geom_point()+
+  geom_line(stat = "summary", fun=mean)+
+  labs(x = "Delay entre aplicacion del producto e inoculación - dias", 
+       y = "IS", 
+       col= "Producto")+
+  scale_y_continuous(labels = scales::percent)
+```
+
+```{r}
+dat_A <- dat %>% filter(var=="A") 
+dat_B <- dat %>% filter(var=="B") 
+```
+
+## Var A
+
+```{r}
+mod_A <- glm(inc ~ trt*dias,
+             weights = total, 
+             family = binomial,
+             data = dat_A)
+
+summary(mod_A)
+hnp::hnp(mod_A)
+# car::Anova(mod_A)
+# DHARMa::testDispersion(mod_A)
+ # DHARMA::simulateResiduals: nobs(model) < nrow(model.frame). A possible reason is that you have observation with zero prior weights (ir binomial with n=0) in your data. Calculating residuals in this case wouldn't be sensible. Please remove zero-weight observations from your data and re-fit your model! If you believe that this is not the reason, please file an issue under https://github.com/florianhartig/DHARMa/issues
+```
+
+```{r}
+mod_A2 <- update(mod_A, family=quasibinomial)
+hnp::hnp(mod_A2)
+em_A2 <- emmeans(mod_A2, ~ trt|dias, type="response")
+res_A2 <- cld(em_A2, Letters = letters, alpha = .05, type = "response")
+res_A2
+```
+
+No hay diferencias entre trat ni dias. NO habria necesidad de continuar con el analisis
+
+## Var B 
+
+Incidencia 
+
+```{r}
+mod_B <- glm(inc ~ trt*dias,
+             weights = total, 
+             family = binomial,
+             data = dat_B)
+summary(mod_B)
+performance::check_overdispersion(mod_B)
+DHARMa::testDispersion(mod_B)
+hnp::hnp(mod_B)
+car::Anova(mod_B)
+```
+
+```{r}
+mod_B2 <- update(mod_B, family=quasibinomial)
+summary(mod_B2)
+DHARMa::testDispersion(mod_B2)
+hnp::hnp(mod_B2)
+summary(mod_B2)
+car::Anova(mod_B2)
+```
+
+Hay interaccion trt x dias
+
+```{r}
+em_B <- emmeans(mod_B, ~ trt|dias, type="response")
+res_B <- cld(em_B, Letters = letters, alpha = .05, type = "response")
+res_B
+```
+
+Indice de Severidad
+
+```{r}
+str(dat_B)
+range(dat_B$dsi)
+# https://stats.stackexchange.com/questions/309047/zero-inflated-beta-regression-using-gamlss-for-vegetation-cover-data
+
+gam_B0 <- gamlss(dsi ~ 1,  
+                 family = BEZI, 
+                 nu.formula = ~dias + trt,
+                 data = na.omit(dat_B), trace = F)
+
+gam_B1 <- gamlss(dsi ~ trt * dias,  
+                 family = BEZI, 
+                 nu.formula = ~dias + trt,
+                 data = na.omit(dat_B), trace = F)
+
+
+gam_B2 <- gamlss(dsi ~ trt + dias,   
+                 family = BEZI, 
+                 nu.formula = ~dias + trt,
+                 data = na.omit(dat_B), trace = F)
+
+gam_B3 <- gamlss(dsi ~ trt,  
+                 family = BEZI, 
+                 nu.formula = ~dias + trt,
+                 data = na.omit(dat_B), trace = F)
+
+gam_B4 <- gamlss(dsi ~ dias,  
+                 family = BEZI, 
+                 nu.formula = ~dias + trt,
+                 data = na.omit(dat_B), trace = F)
+
+compare_performance(gam_B0, gam_B1, gam_B2, gam_B3, gam_B4) #me quedo con el modelo mas sencillo
+plot(gam_B0)
+
+summary(gam_B2)
+em_gam_B <- emmeans(gam_B2, ~ trt|dias, type="response")
+res_gamB <- cld(em_gam_B, Letters = letters, alpha = .05, type = "response")
+res_gamB
+```

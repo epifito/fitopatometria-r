@@ -1,0 +1,141 @@
+```{r}
+pacman::p_load(
+  tidyverse,
+  skimr, janitor,# exploracion de los datos
+  lme4, ordinal, gamlss,  # modelado
+  ggResidpanel,  # diagnostico 
+  DHARMa, 
+  performance,   # evaluar performance de los modelos
+  emmeans,       # medias estimadas por el modelo  
+  multcomp       # comparar las medias entre si - tukey
+  )
+conflicted::conflict_prefer("select", "dplyr")
+conflicted::conflict_prefer("filter", "dplyr")
+```
+
+```{r}
+# https://www2.gov.bc.ca/gov/content/industry/agriculture-seafood/animals-and-crops/plant-health/insects-and-plant-diseases/tree-fruits/fire-blight
+
+vinc_raw <- read_csv("https://github.com/juanchiem/agro_data/raw/master/SummerInoculationFinal.csv") %>% 
+  janitor::clean_names() %>% 
+  select(year, apogee, proca=apogee_bino, pruned, plot, score_factor) 
+
+# vinc_raw %>% rio::export(here::here("glm2/vinc.csv"))
+vinc_raw <- rio::import(here::here("glm2/vinc.csv"))
+vinc_raw
+vinc <- vinc_raw %>% 
+  mutate_at(vars(score_factor, year, plot, apogee, proca, pruned), as.factor) %>% 
+  mutate(score_factor=ordered(score_factor, 
+                              levels = c("0","1","2","3","4")), 
+         pruned = fct_rev(pruned))
+vinc$score_factor
+```
+
+```{r}
+str(vinc)
+glimpse(vinc)
+vinc %>% tabyl(year, apogee, pruned)
+```
+
+```{r}
+mod0 <- clmm(score_factor ~ 1 + (1|plot), data=vinc)
+
+mod1 <- update(mod0, ~ . + apogee * year * pruned)
+anova(mod0, mod1)
+print(summary(mod1),digits=1)
+
+mod2 <- update(mod1, ~ year*proca + year*pruned   +(1|plot))
+anova(mod1, mod2)
+compare_performance(mod0,mod1, mod2)
+
+print(summary(mod2),digits=1)
+# comparar con Table 4
+sjPlot::tab_model(mod2)
+```
+
+The overall disease score was higher in 2019 than 2018 (LR=191 (1 df); P<0.001), presumably in part because disease had more time to progress in shoots between inoculation and observation (7 days in 2018 and 9 days in 2019). 
+
+```{r}
+# year2019    2.6        0.2      11   <2e-16 ***
+
+mod_year <- update(mod0, ~ . + year)
+anova(mod0, mod_year)
+```
+
+The disease score of shoots from plots sprayed with ProCa was lower (CLMM: LR=19.5 (1 df); P<0.001) than for the unsprayed,
+
+```{r}
+# procaYes              -1.5        0.3      -4    2e-05 ***
+mod_proca <- update(mod0, ~ . + proca)
+anova(mod0, mod_proca)
+```
+
+and the ProCa efect was greater in 2019 (interaction) (CLMM: LR=6.3 (1 df); P=0.011). 
+
+```{r}
+mod_proca_adit <- update(mod0, ~ . + proca+year)
+mod_proca_int <- update(mod0, ~ . + proca*year)
+anova(mod_proca_adit, mod_proca_int)
+# year2019:procaYes     -0.6        0.3      -2     0.02 *  
+```
+
+The pruning efect was diferent between years (interaction) (CLMM: LR=21.9 (2 df); P<0.001).  Summer pruning reduced the disease score in 2018 but had no efect in 2019. 
+
+```{r}
+mod_pruned_adit <- update(mod0, ~ . + pruned+year)
+mod_pruned_int <- update(mod0, ~ . + pruned*year)
+anova(mod_pruned_adit, mod_pruned_int)
+
+# year2019:prunedNo  -1.1        0.2      -5    4e-06 ***
+# > emm_mod1. = emmeans(mod2, ~   pruned | year)
+# > cld(emm_mod1.)
+# year = 2018:
+#  pruned emmean    SE  df asymp.LCL asymp.UCL .group
+#  Yes      1.06 0.274 Inf     0.524      1.60  1    
+#  No       1.85 0.276 Inf     1.312      2.39   2   
+# 
+# year = 2019:
+#  pruned emmean    SE  df asymp.LCL asymp.UCL .group
+#  No       3.07 0.281 Inf     2.518      3.62  1    
+#  Yes      3.35 0.282 Inf     2.798      3.90  1    
+
+```
+
+There was no interaction between ProCa sprays and pruning (CLMM: LR=7.6 (1 df); P=0.27) or higher order interaction. 
+
+```{r}
+mod_procapruned_adit <- update(mod0, ~ . + pruned + proca)
+mod_procapruned_int <- update(mod0, ~ . + pruned*proca)
+anova(mod_procapruned_adit, mod_procapruned_int)
+
+# mod1
+# apogeeNone:prunedNo                 0.07       0.79     0.1     0.93    
+# apogeeSymptom:prunedNo              0.58       0.80     0.7     0.47 
+```
+The efect of ProCa (odds ratio (OR) approx. 4× in 2018 and 8× in 2019) was the same for both spray initiation timings (CLMM: LR=1.8 (2 df); P=0.41).
+```{r}
+# anova(mod1, mod2)
+# mod1     16 2537.1 -1252.6  5.4586  4     0.2434
+```
+
+
+```{r}
+emm_mod1 = emmeans(mod2, ~ proca * pruned | year)
+cld(emm_mod1)
+
+emm_mod1. = emmeans(mod2, ~   pruned | year)
+cld(emm_mod1.)
+# pred <- ggpredict(mod.py.yab, c("pruned", "apogee_bino"))
+```
+
+```{r}
+vinc %>% 
+  mutate(apogee=fct_relevel(apogee, "None")) %>% 
+  ggplot()+
+  aes(x = pruned, fill = score_factor)+
+  geom_bar(position = position_fill(reverse = TRUE))+
+  facet_grid(year ~ apogee )+
+  labs(x="", y="Proportion of shoots")+
+  scale_fill_grey(name = 'Score', start =.89, end = 0 )+
+  scale_x_discrete(labels = c("Pruned", "Control"))
+```

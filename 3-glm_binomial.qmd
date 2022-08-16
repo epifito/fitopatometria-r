@@ -315,52 +315,57 @@ knitr::kable(res_phom_GLM)
 
 trt 1 es el nivel de referencia, y el resto de trat se suman a este para la estimacion de su media:
 
-Pero ahora en escala de log ODDS
 
 ```{r}
-summary(mod_phom_GLM2)
-knitr::kable(res_phom_GLM)
+# p
+res_phom_GLM
+p_t1 = 0.4357
 
-LO_t1 = -0.2585
-p_t1 = 0.4357251
-
+# ODDS
 odds_t1 = 0.4357251 / (1-0.4357251)
-odds_t1 
+odds_t1
+# 0.77 
+tab_model(mod_phom_GLM2) 
 
+# log_ODDS
 log(odds_t1)
-LO_t1
-# volver a slide 15
+# -0.2585 
+summary(mod_phom_GLM2)
 ```
 
 Resto de tratamientos
 
 ```{r}
+# p
+res_phom_GLM
 p_t2 = 0.2763751
+
+# ODDS
 odds_t2 = 0.2763751 / (1-0.2763751)
-
+odds_t2 
+odds_t1
 OR_t2_t1 = odds_t2/odds_t1
+OR_t2_t1 
+# 0.4946108
+tab_model(mod_phom_GLM2) 
 
-OR_t2_t1 #  0.4946108
+round(1-0.4946108, 2)
+# la incidencia se reduce en un 51% en el trt 2 respecto al trt 1, P<0.001
 
 log(OR_t2_t1) # chequear con summary
+# -0.7039842
 summary(mod_phom_GLM2)
-log(OR_t2_t1) # chequear con summary
+
+# Camino inverso?? del logODDS al ODDS
+exp(-0.7039842)
+# 0.4946029
 
 # similar al LM?
 log(odds_t2) - log(odds_t1)
-
+# -0.7039842
 ```
 
-```{r}
-# t2 directamente del summary
-exp(-0.7040)
-OR_t2_t1
-tab_model(mod_phom_GLM2)
-(1-0.4946029) * 100
-# 50.53971
-```
-
-> La chance de un foliolo de frutilla presentar sintoma de phomopsis disminuye un 50% cuando se aplica el tratamiento 2 respecto al control sin tratar
+> La probabilidad de un foliolo de frutilla presentar sintoma de phomopsis disminuye un 51% cuando se aplica el tratamiento 2 respecto al control sin tratar
 
 ```{r}
 knitr::kable(res_phom_LM)
@@ -370,6 +375,48 @@ knitr::kable(res_phom_GLM)
 • Los errores estándar estimados (SE) son todos incorrectos (por definición), deben ser funciones de la media para datos binomiales
 
 • Los SE incorrectos darán pruebas incorrectas de significación para los efectos del tratamiento y conducirán a conclusiones incorrectas
+
+### Overdispersion
+
+[Proportion Data - Lirbo Crawley](http://cmq.esalq.usp.br/BIE5781/lib/exe/fetch.php?media=leituras:crawley_cap16.pdf)
+
+```{r}
+germi <- rio::import("http://www.bio.ic.ac.uk/research/mjcraw/therbook/data/germination.txt")
+germi
+```
+
+
+```{r}
+model<-glm(cbind(count, sample-count) ~ Orobanche * extract, binomial, germi)
+summary(model)
+1-pchisq(model$deviance,model$df.residual)
+# el ajuste obtenido no es bueno, dado que es inferior a 0.05, no significativo.
+model$deviance/model$df.residual
+# 33.278/17
+# The overdispersion factor is almost 2. The simplest way to take this into account is to
+# use what is called an ‘empirical scale parameter’ to reflect the fact that the errors are not
+# binomial as we assumed, but were larger than this (overdispersed) by a factor of 1.9576.
+# We refit the model using quasibinomial to account for the overdispersion:
+hnp::hnp(model)
+testDispersion(model, type = "PearsonChisq")
+```
+
+
+```{r}
+model2 <- glm(cbind(count, sample-count) ~ Orobanche * extract, 
+            family=quasibinomial, data=germi)
+anova(model2,test="F")
+```
+
+
+```{r}
+model3 <- update(model2, ~ . - Orobanche:extract)
+anova(model2,model3,test="F")
+hnp::hnp(model3)
+em3 <- emmeans(model3, ~ extract, type="response")
+res3 <- cld(em3, Letters = letters, alpha = .05, type = "response")
+res3
+```
 
 ## Reg. Logistica
 
@@ -435,11 +482,6 @@ dat60 %>%
 ```
 
 ```{r}
-# mod1 <- glmer(
-#   cbind(dis_plants, n_plants-dis_plants) ~ geno + (1|bk), 
-#   family="binomial", 
-#   data=dat60) 
-
 mod1 <- glmer(
   inc_prop ~ geno + (1|bk), # bloque como efecto aleatorio
   weights=n_plants,         
@@ -460,12 +502,13 @@ Otro gran aliado es el paquete "emmeans" quien nos devuelve las estimaciones en 
 ```{r}
 em1 <- emmeans(mod1, ~ geno, type="response")
 res1 <- cld(em1, Letters = letters, alpha = .05, type = "response")
-knitr::kable(res1)
 ```
 
 Interpretacion de coef y medidas de efecto
 
 ```{r}
+1-0.67/2.33 
+knitr::kable(res1)
 # lo que nos da el emmeans
 p_A = 0.1066667
 p_B =  0.0933333
@@ -473,14 +516,14 @@ p_B =  0.0933333
 odds_A = p_A/(1-p_A)
 odds_B = p_B/(1-p_B)
 
-# lo que nos da el tab_model
 OR_B_A = odds_B/odds_A
 OR_B_A
+# 0.8621317
+tab_model(mod1)
 
 # lo que nos da el summary 
-log_OR_B_A = log(OR_B_A)
-log_OR_B_A  
 summary(mod1)
+log(OR_B_A)
 ```
 
 -   90 d
@@ -492,11 +535,6 @@ dat90 %>%
   ggplot() + 
   aes(x=geno, y=inc_prop) + 
   geom_point()
-
-# mod1 <- glmer(
-#   cbind(dis_plants, n_plants-dis_plants) ~ geno + (1|bk), 
-#   family="binomial", 
-#   data=dat60)
 ```
 
 ```{r}
@@ -520,7 +558,7 @@ Vemos que ahora si, el geno tiene efecto significativo sobre la incidencia de la
 tab_model(mod2)
 ```
 
-podemos decir que la chance de presentar la enfermedad del genotipo B es 71% (1 - 0.29 = 0.71 \* 100) menor en relacion al geno A
+podemos decir que la probabilidad de presentar la enfermedad del genotipo B es 71% (1 - 0.29 = 0.71 \* 100) menor en relacion al geno A
 
 ```{r}
 plot_model(mod2, type='pred', show.data=T)
@@ -562,11 +600,11 @@ car::Anova(mod3)
 (anecdotico: days como factor con 2 niveles)
 
 ```{r}
-car::Anova(glmer(inc_prop ~ geno * factor(days) + 
-                (1|bk) + (1|bk:geno), 
-              weights=n_plants,
-              family="binomial",
-              data=dat60_90))
+# car::Anova(glmer(inc_prop ~ geno * factor(days) + 
+#                 (1|bk) + (1|bk:geno), 
+#               weights=n_plants,
+#               family="binomial",
+#               data=dat60_90))
 ```
 
 Removiendo la interaccion, dejando como efectos simples geno y dias
