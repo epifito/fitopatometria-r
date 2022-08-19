@@ -27,11 +27,14 @@ sbr <- tibble::tribble(
 theme_set(theme_bw())
 
 # Viz
-  sbr %>% 
-  pivot_longer(2:6, names_to = "rater",
+sbr %>% 
+  pivot_longer(2:6, 
+               names_to = "rater",
                values_to = "estimate") %>% 
-  ggplot(aes(leaf, estimate, color = rater,
-             group = rater, col=rater))+
+  ggplot()+
+  aes(x=leaf,y=estimate, 
+      group = rater, 
+      col=rater)+
   geom_line()+
   geom_point(size = 2)+
   labs(y = "Severity estimate (%)",
@@ -44,7 +47,8 @@ sbr_long <- sbr %>%
                names_to = "rater",
                values_to = "estimate") 
 sbr_long %>%    
-  ggplot(aes(actual, estimate))+
+  ggplot()+
+  aes(x=actual,y=estimate)+
   geom_point(alpha = 0.7)+
   facet_wrap(~rater)+
   ylim(0,45)+
@@ -79,7 +83,8 @@ library(epiR)
 sbr2 <- sbr_long %>% 
   filter(rater == "R2")
 
-ccc <- epi.ccc(sbr2$actual, sbr2$estimate)
+ccc2 <- epi.ccc(sbr2$actual, sbr2$estimate)
+ccc2
 
 # Concordance coefficient
 rho <- ccc$rho.c[,1]
@@ -88,10 +93,7 @@ rho
 # Bias coefficient
 Cb <- ccc$C.b
 Cb
-
-# Precision
-r <- ccc$C.b*ccc$rho.c[,1]
-r
+0.58 * Cb
 
 # Scale-shift
 ss <- ccc$s.shift
@@ -104,13 +106,14 @@ ls
 # Confiabilidad ----  
 # Reliability 
 
-
 # Solo evaluadores
 
-raters <- sbr |> 
+raters <- sbr %>% 
   select(3:6)
+raters
 
 library(irr)
+
 icc(raters, "twoway")
 # twoway: both raters and leaves are viewed as random effects
 
