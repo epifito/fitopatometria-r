@@ -1,8 +1,13 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: inline
+---
 ```{r}
 pacman::p_load(
   tidyverse,
   skimr, janitor,# exploracion de los datos
-  lme4, ordinal, gamlss,  # modelado
+  lme4, ordinal, # modelado
   ggResidpanel,  # diagnostico 
   DHARMa, 
   performance,   # evaluar performance de los modelos
@@ -21,14 +26,17 @@ vinc_raw <- read_csv("https://github.com/juanchiem/agro_data/raw/master/SummerIn
   select(year, apogee, proca=apogee_bino, pruned, plot, score_factor) 
 
 # vinc_raw %>% rio::export(here::here("glm2/vinc.csv"))
-vinc_raw <- rio::import(here::here("glm2/vinc.csv"))
+# vinc_raw <- rio::import(here::here("glm2/vinc.csv"))
 vinc_raw
+```
+
+
+```{r}
 vinc <- vinc_raw %>% 
   mutate_at(vars(score_factor, year, plot, apogee, proca, pruned), as.factor) %>% 
-  mutate(score_factor=ordered(score_factor, 
-                              levels = c("0","1","2","3","4")), 
+  mutate(score_factor = ordered(score_factor, levels = c("0","1","2","3","4")), 
          pruned = fct_rev(pruned))
-vinc$score_factor
+str(vinc)
 ```
 
 ```{r}
@@ -44,7 +52,7 @@ mod1 <- update(mod0, ~ . + apogee * year * pruned)
 anova(mod0, mod1)
 print(summary(mod1),digits=1)
 
-mod2 <- update(mod1, ~ year*proca + year*pruned   +(1|plot))
+mod2 <- update(mod1, ~ year*proca + year*pruned +(1|plot))
 anova(mod1, mod2)
 compare_performance(mod0,mod1, mod2)
 
@@ -57,7 +65,6 @@ The overall disease score was higher in 2019 than 2018 (LR=191 (1 df); P<0.001),
 
 ```{r}
 # year2019    2.6        0.2      11   <2e-16 ***
-
 mod_year <- update(mod0, ~ . + year)
 anova(mod0, mod_year)
 ```
@@ -87,8 +94,9 @@ mod_pruned_int <- update(mod0, ~ . + pruned*year)
 anova(mod_pruned_adit, mod_pruned_int)
 
 # year2019:prunedNo  -1.1        0.2      -5    4e-06 ***
-# > emm_mod1. = emmeans(mod2, ~   pruned | year)
-# > cld(emm_mod1.)
+
+emm_mod1. = emmeans(mod2, ~   pruned | year)
+cld(emm_mod1.)
 # year = 2018:
 #  pruned emmean    SE  df asymp.LCL asymp.UCL .group
 #  Yes      1.06 0.274 Inf     0.524      1.60  1    
@@ -113,8 +121,9 @@ anova(mod_procapruned_adit, mod_procapruned_int)
 # apogeeSymptom:prunedNo              0.58       0.80     0.7     0.47 
 ```
 The efect of ProCa (odds ratio (OR) approx. 4× in 2018 and 8× in 2019) was the same for both spray initiation timings (CLMM: LR=1.8 (2 df); P=0.41).
+
 ```{r}
-# anova(mod1, mod2)
+anova(mod1, mod2)
 # mod1     16 2537.1 -1252.6  5.4586  4     0.2434
 ```
 
@@ -125,6 +134,8 @@ cld(emm_mod1)
 
 emm_mod1. = emmeans(mod2, ~   pruned | year)
 cld(emm_mod1.)
+
+sjPlot::tab_model(mod2)
 # pred <- ggpredict(mod.py.yab, c("pruned", "apogee_bino"))
 ```
 

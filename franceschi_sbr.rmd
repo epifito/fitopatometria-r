@@ -1,19 +1,30 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
 # SAD
 
 ```{r}
-pacman::p_load(epiR, irr, correlation, lme4, purrr, broom, car, emmeans, multcomp)
+pacman::p_load(epiR, irr, correlation, lme4, purrr, broom, car, emmeans, multcomp, tidyverse)
 
 # sad_wide_raw <- rio::import(here::here("data", "data-sad.csv"))
 sad_wide_raw <- read_csv("https://raw.githubusercontent.com/juanchiem/agro_data/master/data-sad.csv") 
 
 sad_wide_raw %>% 
+  janitor::tabyl(method, leaf)
+
+sad_wide_raw %>% str
+
+sad_wide_raw %>% 
   separate(method, c("author","method"),  "_") %>%   
   mutate_if(is.character, as.factor) %>% 
   mutate_at(vars(author, method), fct_rev) -> sad_wide
-sad_wide
+
+sad_wide %>% str
 ```
 
-We need to reshape this data frame to the tidy format, where all responses are in a single column which facilitates further work within the `tidyverse`. For this, we use the `gather` function and create the `rater` and the `estimate` variables to accomodate data from the multiple columns. We should indicate the columns to gather, which are 4 to 23 and this way the first three columns are kept as we want: method, leaf and actual severity.
+We need to reshape this data frame to the tidy format, where all responses are in a single column which facilitates further work within the `tidyverse`. For this, we use the `pivot_longer` function and create the `rater` and the `estimate` variables to accomodate data from the multiple columns. We should indicate the columns to gather, which are 4 to 23 and this way the first three columns are kept as we want: method, leaf and actual severity.
 
 ```{r}
 sad_wide %>%
@@ -61,10 +72,11 @@ Per rater
 
 ```{r}
 sad %>%
+  filter(rater<11) %>% 
   ggplot(aes(leaf, actual, col = method)) +
   geom_point(aes(leaf, estimate), size = 1, alpha = 0.2) +
   geom_smooth(aes(leaf, estimate), se = F) +
-  facet_wrap(~ author*rater) +
+  facet_grid(author~rater) +
   labs(y = "Value", x = "Leaf")
 ```
 
@@ -72,6 +84,7 @@ And now for the error of the estimates.
 
 ```{r}
 sad %>%
+  filter(rater<11) %>% 
   ggplot(aes(leaf, estimate - actual, color = method)) +
   geom_hline(yintercept = 0) +
   geom_point(aes(leaf, estimate - actual), size = 0.5, alpha = 0.1) +
@@ -96,6 +109,7 @@ Veamos como opera la función `epi.ccc`. Para ello tomemos el primer evaluador d
 
 ```{r}
 sad %>% 
+  # filter(rater==1) %>% 
   nest(data = c(leaf, actual, estimate)) %>% 
   slice(1) %>% 
   unnest(data) -> rater_1
@@ -149,6 +163,8 @@ metrics %>%
   mutate_at(vars(author, method, rater), as.factor) %>% 
   mutate_if(is.character, as.double) %>% 
   ungroup -> metric_results#
+
+metric_results
 ```
 
 ```{r}
@@ -174,7 +190,8 @@ metric_new <- metric_results %>%
 ```
 
 ```{r}
-pc_old <- lmer(LCC ~ method + (1 | rater), data = metric_old, REML = FALSE)
+pc_old <- lmer(LCC ~ method + (1 | rater), 
+               data = metric_old, REML = FALSE)
 means_pc_old <- emmeans(pc_old, ~ method)
 res_pc_old <- cld(means_pc_old, Letters=letters)
 res_pc_old
@@ -213,8 +230,11 @@ sad_noaid_old %>%
 
 Solo Unaided Old
 ```{r}
-sad_occc_noaid_old <- epi.occc(sad_noaid_old2, na.rm = FALSE, pairs = TRUE)
+sad_occc_noaid_old <- epi.occc(sad_noaid_old2, 
+                               na.rm = FALSE, pairs = TRUE)
+
 sad_icc_noaid_old <- icc(sad_noaid_old2, model = "twoway", unit = "single", type = "consistency")
+
 sad_occc_noaid_old$occc
 sad_icc_noaid_old$value
 ```
