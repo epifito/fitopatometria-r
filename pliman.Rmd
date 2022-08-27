@@ -16,10 +16,9 @@ editor_options:
 ```{r setup, include=FALSE}
 # install.packages("BiocManager")
 # BiocManager::install("EBImage")
+# install.packages(devtools)
 # devtools::install_github ("TiagoOlivoto/pliman")
-
-pacman::p_load(tidyverse, pliman, here)
-# pacman::p_load(tidyverse)
+pacman::p_load(tidyverse, pliman, here, epiR)
 conflicted::conflict_prefer("filter", "dplyr")
 conflicted::conflict_prefer("select", "dplyr")
 ```
@@ -34,10 +33,6 @@ Reproduciremos el post de Open Plant Pathology escrito por Emerson del Ponte
 
 Noten que pliman requiere R version 4 y el paquete "EBImage" (este paso se hace una sola vez)
 
-
-```{r}
-pacman::p_load(tidyverse, pliman, epiR)
-```
 
 * Indicar background (b), sano (h) y sintomatico (s) 
 
@@ -58,6 +53,7 @@ image_combine(h, s, b, ncol = 3)
 Importamos una solo imagen 
 
 ```{r}
+here()
 # setwd(here::here())
 img46 <- image_import("sbr_franceschi/img46.png", plot=TRUE)
 ```
@@ -151,20 +147,19 @@ ccc
 
 que tal??
 
-
-
 # Severidad de mildiu en colza
 
 Me situo en la la carpeta que contiene el set de fotos a procesar
 
 ```{r}
+getwd()
 setwd(here::here("mildiu_pics"))
-# getwd()
 files <- list.files()%>% data.frame 
+getwd()
 ```
 
 Indicamos cuales son los pixeles correspondientes a: 
-* helathy-sano 
+* healthy-sano 
 * diseased-enfermo 
 * background - fondo 
 
@@ -218,7 +213,7 @@ sev_lote
 vemos que es una lista de cuyo elementos nos interesa el dataframe $severity
 
 ```{r}
-sev_df <- sev_lote[["severity"]]
+sev_df <- sev_lote$severity
 sev_df
 ```
 
@@ -233,6 +228,7 @@ sev_mildiu <- sev_df %>%
   summarise(sev_cond=mean(symptomatic)) %>%  
   ungroup() %>% 
   mutate_at(vars(trat, rep), as.factor)
+sev_mildiu
 ```
 
 ## Incidencia
@@ -240,8 +236,9 @@ sev_mildiu <- sev_df %>%
 Datos de incidencia a nivel de parcela
 
 ```{r}
-inc_mildiu  <- rio::import(here::here("mildiu_pics/inc_mildiu.txt"))%>% 
+inc_mildiu  <- rio::import("incmildiu.txt")%>% 
   mutate_at(vars(trat, rep), as.factor)  
+
 inc_mildiu
 str(inc_mildiu)
 ```
@@ -249,8 +246,7 @@ str(inc_mildiu)
 ## Joint-data
 
 ```{r}
-dis_mildiu <- inc_mildiu %>% 
-  left_join(sev_mildiu)
+dis_mildiu <- inc_mildiu %>% left_join(sev_mildiu)
 dis_mildiu
 ```
 
@@ -258,14 +254,15 @@ Calculamos severidad media
 
 ```{r}
 dis_mildiu <- dis_mildiu %>% 
-  group_by(trat, rep) %>% 
-  mutate(sev_media = sev_cond*(y/n))
+  # group_by(trat, rep) %>% 
+  mutate(sev_media = sev_cond * (y/n))
+dis_mildiu
 ```
 
 
 ```{r}
 dis_mildiu
-save(dis_mildiu, file=here::here("mildiu_pics/mild.Rdata"))
+# save(dis_mildiu, file=here::here("mildiu_pics/mild.Rdata"))
 ```
 
 ```{r}
@@ -289,10 +286,10 @@ dis_mildiu %>%
 ```
 
 
-
 ## SAD
+
 ```{r}
-sad(sbr_measures, n = 8, ncol = 3)
+sad(sbr_lote, n = 8, ncol = 3)
 ```
 
 # Otros
@@ -300,6 +297,7 @@ sad(sbr_measures, n = 8, ncol = 3)
 Tamaño de lesiones
 
 ```{r}
+setwd(here::here())
 rust <- image_import("pliman_pics/img_1.jpeg",  plot = TRUE)
 ```
 
@@ -321,6 +319,7 @@ feat <-
                   show_image = TRUE,
                   show_features = TRUE, # computa características das lesões
                   lesion_size = "medium") # padrão
+# save()
 ```
 
 ```{r}
@@ -363,7 +362,6 @@ huevos_cont <-
 huevos_cont$statistics
 ```
 
-
 Here, we will count the grains in the grains.jpg image. This image has a cyan background and contains 90 soybeans that touch each other. 
 
 ```{r}
@@ -385,7 +383,7 @@ count$statistics
 ```{r}
 count700 <- analyze_objects(grains,
                             marker = "id",
-                            lower_size = 700)
+                            lower_size = 670)
 count700
 ```
 
@@ -399,18 +397,19 @@ az <- image_import("pliman_pics/micelio1.jpg", plot=TRUE)
 # az1 <-image_segment_mask(az, size = 310)
 ```
 
+Indico alguna referencia de tamaño conocido 
 
 ```{r}
 x11(); 
 A <- dpi(az)
 A
+# [1] 86.68559
 ```
 
 
 ```{r}
 x11() 
 back <- pick_palette(az)
-dev.off()
 plot(back)
 ```
 
@@ -423,25 +422,26 @@ plot(fore)
 
 
 ```{r}
-back <- image_import("mildiu_pics/micelio_fondo.png")
-fore <- image_import("mildiu_pics/micelio_frente.png")
-b <- image_import("back.png")
+# back <- image_import("mildiu_pics/micelio_fondo.png")
+# fore <- image_import("mildiu_pics/micelio_frente.png")
+# b <- image_import("back.png")
 ```
 
 ```{r}
 res_az <- analyze_objects(az,
                 background = back,
                 foreground = fore,
+                filter = 2,
                 index = "(G+B)^3-R",
                 watershed = FALSE,
-                filter = 2,
                 contour_size = 3,
-                contour_col = "black")
-az_0.1 <- get_measures(res_az, dpi = 254)
-plot_measures(az_0.1, 
-              measure = "area",
-              col = "blue")
+                contour_col = "red")
 
+get_measures(res_az, dpi = 87) %>% 
+  plot_measures(measure = "area", col = "blue")
+
+pi * (4.5^2)
+20.5/63.6
 ```
 
 
